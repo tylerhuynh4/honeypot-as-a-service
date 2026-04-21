@@ -1,12 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 import logging
 
 app = Flask(__name__)
 
-logging.basicConfig(filename='honeypot.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s',
-                    force=True)
+logging.basicConfig(filename = 'honeypot.log',
+                    level = logging.INFO,
+                    format = '%(asctime)s - %(message)s',
+                    force = True)
 
 # reusable log helper 
 def log_visit(path):
@@ -19,9 +19,16 @@ def home():
     log_visit('/')
     return render_template('login.html')
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods = ['GET', 'POST'])
 def login():
     log_visit('/login')
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        logging.info(f"Login attempt from user: {username} & pwd: {password}")
+        for h in logging.getLogger().handlers:
+            h.flush()
     return render_template('login.html')
 
 @app.route('/admin')
@@ -33,6 +40,11 @@ def admin():
 def patient_records():
     log_visit('/patient-records')
     return render_template('patient_records.html')
+
+@app.route('/files/<path:filename>')
+def static_files(filename):
+    log_visit(f'/files/{filename}')
+    return send_from_directory('static', filename)
 
 if __name__ == '__main__':
     app.run(debug = True)
