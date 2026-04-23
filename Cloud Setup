@@ -1,1 +1,58 @@
+Cloud Infrastructure and Monitoring Setup
+
+Overview
+We setup a cloud environment on AWS to deploy and monitor honeypots. 
+The goal was to create a system where we can run honeypots on an EC2 instance, collect logs, detect suspicios activity, and get alerts. 
+We used EC2 for hosting, Docker to run containers, Cloudwatch for logging, SNS for alerts, and S3 to store logs securely. 
+
+Architecture
+The system is built around an EC2 instance where the honeypots will run using Docker.
+Any activity on the system generates logs, which are collected by the Cloudwatch agent. 
+These logs are then analyzed using metric filters. 
+If something suspicious is detected like an error or failed attempt, a Cloudwatch alarm is triggered and sends an email alert through SNS.
+All logs are also stored in an S3 bucket for backup and further analysis. 
+
+EC2 → Docker Honeypot → Logs → CloudWatch → Alarm → SNS → Email
+                                   ↓
+                                   S3
+
+Implementation Steps 
+
+EC2 Setup
+Created EC2 instance (Amazon Linux 2023).
+Configured security groups (ports 80, 443, 8080).
+Attached IAM role for SSM and CloudWatch.
+
+Docker Setup
+Installed Docker
+Configured user permissions.
+Tested deployment using Nginx container.
+
+Logging (CloudWatch)
+Installed CloudWatch agents.
+Configured log collection from /var/log/messages.
+Verified logs appear in CloudWatch.
+
+Alerts (SNS + Alarm)
+Created SNs topic and subscriptions.
+Configured CloudWatch metric filter.
+Created alarm to trigger notifications.
+
+Storage (S3)
+Created secure S3 bucket.
+Enabled encryption (SSE-S3).
+Enabled versioning for log retention.
+
+Security Measures
+Security was implemented using IAM roles for least privilege access, enecrypted storage in S3.
+Restricted security group rules, and private log monitoring through CloudWatch.
+
+Testing and Validation
+The system was tested by deploying a Docker container and generating log events.
+These logs were successfully captured in CloudWatch, and alerts were triggered via SNS when predefined conditions were met. 
+
+Conclusion
+The cloud setup successfully provides a secure, scalable, and monitored environemnet for deploying honeypots. 
+It ensures real-time detection and alerting of suspicious activity while maintaining secure log storage. 
+
 
