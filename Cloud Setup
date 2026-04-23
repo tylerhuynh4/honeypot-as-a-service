@@ -1,9 +1,9 @@
 Cloud Infrastructure and Monitoring Setup
 
 Overview
-We setup a cloud environment on AWS to deploy and monitor honeypots. 
+A cloud environment on AWS was setup to deploy and monitor honeypots. 
 The goal was to create a system where we can run honeypots on an EC2 instance, collect logs, detect suspicios activity, and get alerts. 
-We used EC2 for hosting, Docker to run containers, Cloudwatch for logging, SNS for alerts, and S3 to store logs securely. 
+EC2 is used for hosting, Docker to run containers, CloudWatch for logging, SNS for alerts, and S3 to store logs securely. 
 
 Architecture
 The system is built around an EC2 instance where the honeypots will run using Docker.
