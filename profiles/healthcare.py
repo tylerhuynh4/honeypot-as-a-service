@@ -3,7 +3,7 @@ import logging
 
 healthcare = Blueprint('healthcare', __name__)
 
-# reusable log helper
+# reusable logger
 def log_visit(path):
     msg = f"Hit: {path} | IP: {request.remote_addr} | Method: {request.method}"
     logging.info(msg)
