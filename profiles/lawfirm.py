@@ -5,7 +5,7 @@ lawfirm = Blueprint('lawfirm', __name__)
 
 # reusable logger
 def log_visit(path):
-    msg = f"Hit: {path} | IP: {request.remote_addr} | Method: {request.method}"
+    msg = f"Hit: /lawfirm{path} | IP: {request.remote_addr} | Method: {request.method}"
     logging.info(msg)
     for h in logging.getLogger().handlers:
         h.flush()
@@ -16,7 +16,7 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        logging.info(f"Login attempt | user: {username} | password: {password}")
+        logging.info(f"Login attempt | profile: lawfirm | user: {username} | password: {password}")
         for h in logging.getLogger().handlers:
             h.flush()
     return render_template('lawfirm/login.html')
