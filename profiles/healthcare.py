@@ -40,3 +40,13 @@ def patient_records():
 def files(filename):
     log_visit(f'/files/{filename}')
     return send_from_directory('static/healthcare', filename)
+
+@healthcare.route('/.env')
+def env():
+    log_visit('/.env')
+    return send_from_directory('static/healthcare', '.env')
+
+@healthcare.route('/backup.sql')
+def backup_sql():
+    log_visit('/backup.sql')
+    return send_from_directory('static/healthcare', 'backup.sql', as_attachment = True)

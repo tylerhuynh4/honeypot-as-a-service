@@ -1,0 +1,8 @@
+AIM AI Lab — Experiment Logs
+==============================
+[2026-03-01] DS-001 training run started — VisionTransformer v2.3
+[2026-03-02] Epoch 10/50 — loss: 0.342, acc: 87.3%
+[2026-03-03] Epoch 20/50 — loss: 0.201, acc: 91.8%
+[2026-03-04] Epoch 50/50 — loss: 0.089, acc: 94.2%
+[2026-03-05] Model saved to /models/visiontransformer_v2.3.pt
+[2026-03-10] DS-003 access restricted — pending ethics review

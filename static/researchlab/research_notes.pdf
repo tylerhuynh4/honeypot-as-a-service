@@ -1,0 +1,6 @@
+Apex AI Lab Research Notes — CONFIDENTIAL
+Project: MedicalClassifier v3.0
+Lead: Dr. A. Cardenas
+Status: Restricted — IRB approval pending
+Notes: Model trained on 91GB medical imaging dataset.
+Accuracy: 97.1% on held-out test set.

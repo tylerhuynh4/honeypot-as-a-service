@@ -54,4 +54,5 @@ def client_list():
 @lawfirm.route('/firm-files/<path:filename>')
 def files(filename):
     log_visit(f'/firm-files/{filename}')
-    return send_from_directory('static/lawfirm', filename)
+    as_attachment = filename.endswith('.pdf')
+    return send_from_directory('static/lawfirm', filename, as_attachment = as_attachment)
