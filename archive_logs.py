@@ -67,12 +67,15 @@ def archive_log():
     print("Live log cleared")
 
     # Upload S3 creds here
-    # import boto3
-    # s3 = boto3.client('s3')
-    # bucket_name = 'your-bucket-name-here'
-    # s3.upload_file(archive_path, bucket_name, archive_name)
-    # print(f"Uploaded {archive_name} to s3://{bucket_name}")
+    import boto3
+    
+    s3 = boto3.client('s3')
+    bucket_name = 'honeypot-logs-mohammadali'
 
+    s3.upload_file(archive_path, bucket_name, archive_name)
+
+    print(f"Uploaded {archive_name} to s3://{bucket_name}")
+    
 def read_archive(archive_name):
     key = load_key()
     archive_path = os.path.join(ARCHIVE_DIR, archive_name)
