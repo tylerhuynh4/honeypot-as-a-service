@@ -30,13 +30,14 @@ Tested deployment using Nginx container.
 
 Logging (CloudWatch)
 Installed CloudWatch agents.
-Configured log collection from /var/log/messages.
-Verified logs appear in CloudWatch.
+Configured log collection from both /var/log/messages and the honeypot application log file (honeypot.log).
+Verified that system logs and honeypot activity logs appeared successfully in CloudWatch Log Groups.
 
 Alerts (SNS + Alarm)
 Created SNs topic and subscriptions.
 Configured CloudWatch metric filter.
-Created alarm to trigger notifications.
+Created CloudWatch metric filters to detect suspicious activity such as errors and login attempts.
+Configured CloudWatch alarms to automatically trigger SNS email notifications when suspicious activity was detected.
 
 Storage (S3)
 Created secure S3 bucket.
@@ -48,11 +49,11 @@ Security was implemented using IAM roles for least privilege access, enecrypted 
 Restricted security group rules, and private log monitoring through CloudWatch.
 
 Testing and Validation
-The system was tested by deploying a Docker container and generating log events.
-These logs were successfully captured in CloudWatch, and alerts were triggered via SNS when predefined conditions were met. 
+The system was tested by deploying Docker-based honeypot environments and generating suspicious activity such as admin probing, sensitive file access, and simulated login attempts.
+These events were successfully written to honeypot logs, monitored through CloudWatch, and used to trigger automated SNS email alerts.
+The dashboard correctly displayed hits, alerts, unique IPs, and login attempts across multiple honeypot profiles including Healthcare, Law Firm, and Research Lab.
 
 Conclusion
-The cloud setup successfully provides a secure, scalable, and monitored environemnet for deploying honeypots. 
-It ensures real-time detection and alerting of suspicious activity while maintaining secure log storage. 
-
+The final system successfully integrates AWS cloud infrastructure, Docker-based honeypots, centralized logging, automated monitoring, and real-time alerting into a unified cloud security monitoring environment.
+The project demonstrates how suspicious activity can be detected, logged, monitored, and escalated automatically using AWS services.
 
