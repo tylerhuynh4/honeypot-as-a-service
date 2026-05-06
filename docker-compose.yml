@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  haas:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - ./honeypot.log:/app/honeypot.log
+    restart: unless-stopped

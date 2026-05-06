@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for
 from datetime import datetime
 import logging
 import re
+import os
 from profiles.healthcare import healthcare
 from profiles.lawfirm import lawfirm
 from profiles.researchlab import researchlab
@@ -183,4 +184,5 @@ def dashboard_researchlab():
                            alert_count = len(alerts))
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+    app.run(debug = debug)

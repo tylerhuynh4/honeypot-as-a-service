@@ -2,3 +2,6 @@ venv/
 honeypot.log
 __pycache__/
 *.pyc
+secret.key
+log_archive/
+.dockerignore
