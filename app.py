@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, url_for
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import re
 import os
@@ -9,7 +9,8 @@ from profiles.researchlab import researchlab
 
 app = Flask(__name__)
 
-logging.basicConfig(filename = 'honeypot.log',
+os.makedirs('logs', exist_ok = True)
+logging.basicConfig(filename = 'logs/honeypot.log',
                     level = logging.INFO,
                     format = '%(asctime)s - %(message)s',
                     force = True)
@@ -22,10 +23,18 @@ def parse_logs(profile_filter = None):
     hits = []
     login_attempts_list = []
     ips = set()
+    MAX_BYTES = 5 * 1024 * 1024     # 5 MB limit
 
     try:
-        with open('honeypot.log', 'r') as f:
-            lines = f.readlines()
+        with open('logs/honeypot.log', 'rb') as f:
+            f.seek(0, 2)             # seek to end
+            file_size = f.tell()
+            seek_to = max(0, file_size - MAX_BYTES)
+            f.seek(seek_to)
+            if seek_to > 0:
+                f.readline()         # discard first (potentially partial) line
+            data = f.read().decode('utf-8', errors = 'replace')
+            lines = data.splitlines()
 
         for line in lines:
             if 'Hit:' in line:
@@ -89,36 +98,66 @@ def parse_logs(profile_filter = None):
 
 # severity
 def build_alerts(hits, login_attempts_list, ips):
-    alerts = []
+    alerts_dict = {}
     ip_hit_counts = {}
+
+    def add_alert(severity, dedup_key, msg):
+        key = (severity, dedup_key)
+        if key in alerts_dict:
+            alerts_dict[key]['count'] +=1
+        else:
+            alerts_dict[key] = { 'severity': severity, 
+                                 'msg': msg, 
+                                 'count': 1 }
 
     for hit in hits:
         ip = hit['ip']
         path = hit['path']
         ip_hit_counts[ip] = ip_hit_counts.get(ip, 0) + 1
 
-        if any(x in path for x in ['/.env', '/backup.sql', '/config.json', '/db_dump.zip']):
-            alerts.append({ 'severity': 'HIGH',
-                            'msg': f"{ip} accessed sensitive file: {path}" })
+        if any(x in path for x in ['/.env', '/medical_backup.sql', '/config.json', '/db_dump.zip']):
+            add_alert('HIGH', f'sensitive:{ip}:{path}',
+                       f"{ip} accessed sensitive file: {path}")
         
         if path.endswith('/admin'):
-            alerts.append({ 'severity': 'MEDIUM',
-                            'msg': f"{ip} probed admin panel: {path}" })
+            add_alert('MEDIUM', f'admin:{ip}:{path}',
+                       f"{ip} probed admin panel: {path}")
         
         if any(path.endswith(x) for x in ['.zip', '.sql', '.csv', '.pt']):
-            alerts.append({ 'severity': 'MEDIUM',
-                            'msg': f"{ip} downloaded file: {path}" })
+            add_alert('MEDIUM', f'download:{ip}:{path}',
+                       f"{ip} downloaded file: {path}")
+            
+    now = datetime.now()
+    window = timedelta(minutes = 1)
             
     for ip in ips:
-        recent_logins = [l for l in login_attempts_list if l['ip'] == ip]
+        recent_logins = []
+        for l in login_attempts_list:
+            if l['ip'] != ip:
+                continue
+            try:
+                ts = datetime.strptime(l['timestamp'], '%Y-%m-%d %H:%M:%S,%f')
+            except ValueError:
+                continue
+            if now - ts <= window:
+                recent_logins.append(1)
+
         if len(recent_logins) >= 5:
-            alerts.append({ 'severity': 'HIGH',
-                            'msg': f"{ip} made {len(recent_logins)} login attempts" })
+            add_alert('HIGH', f'bruteforce:{ip}',
+                       f"{ip} made {len(recent_logins)} attempts in 1 min")
     
     for ip, count in ip_hit_counts.items():
         if count >= 3:
-            alerts.append({ 'severity': 'LOW',
-                            'msg': f"{ip} made {count} requests" })
+            add_alert('LOW', f'volume:{ip}',
+                       f"{ip} made {count} requests")
+            
+    # converts dict to list & append count to msg if > 1
+    alerts = []
+    for entry in alerts_dict.values():
+        msg = entry['msg']
+        if entry['count'] > 1:
+            msg += f" (x{entry['count']})"
+        alerts.append({'severity': entry['severity'], 'msg': msg})
         
     alerts = sorted(alerts, key = lambda x: ['HIGH', 'MEDIUM', 'LOW'].index(x['severity']))
     return alerts

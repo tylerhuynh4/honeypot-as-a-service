@@ -10,13 +10,18 @@ def log_visit(path):
     for h in logging.getLogger().handlers:
         h.flush()
 
+@lawfirm.route('/', strict_slashes = False)
+def home():
+    log_visit('/')
+    return render_template('lawfirm/login.html')
+
 @lawfirm.route('/login', methods = ['GET', 'POST'])
 def login():
     log_visit('/login')
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        logging.info(f"Login attempt | profile: lawfirm | user: {username} | password: {password}")
+        logging.info(f"Login attempt | profile: lawfirm | IP: {request.remote_addr} | user: {username} | password: {password}")
         for h in logging.getLogger().handlers:
             h.flush()
     return render_template('lawfirm/login.html')
@@ -50,6 +55,21 @@ def archive():
 def client_list():
     log_visit('/client-list')
     return render_template('lawfirm/client_list.html')
+
+@lawfirm.route('/.env')
+def env():
+    log_visit('/.env')
+    return send_from_directory('static/lawfirm', '.env')
+
+
+@lawfirm.route('/document-upload', methods = ['GET', 'POST'])
+def document_upload():
+    log_visit('/document-upload')
+    if request.method == 'POST':
+        # doesn't actually save anything
+        filename = request.files.get('file').filename if 'file' in request.files else 'unknown'
+        logging.info(f"Document upload attempt | profile: lawfirm | IP: {request.remote_addr} | filename: {filename}")
+    return render_template('lawfirm/document_upload.html')
 
 @lawfirm.route('/firm-files/<path:filename>')
 def files(filename):

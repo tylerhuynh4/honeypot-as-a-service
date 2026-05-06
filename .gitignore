@@ -1,7 +1,22 @@
-venv/
-honeypot.log
+# Python
 __pycache__/
-*.pyc
-secret.key
+*.py[cod]
+venv/
+.venv/
+
+# Logs and runtime data
+logs/
 log_archive/
-.dockerignore
+honeypot.log
+*.log
+
+# key
+secret.key
+
+# junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

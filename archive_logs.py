@@ -3,7 +3,7 @@ import shutil
 from datetime import datetime
 from cryptography.fernet import Fernet
 
-LOG_FILE = 'honeypot.log'
+LOG_FILE = 'logs/honeypot.log'
 ARCHIVE_DIR = 'log_archive'
 KEY_FILE = 'secret.key'
 

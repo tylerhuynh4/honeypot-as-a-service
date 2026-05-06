@@ -10,7 +10,7 @@ def log_visit(path):
     for h in logging.getLogger().handlers:
         h.flush()
 
-@healthcare.route('/')
+@healthcare.route('/', strict_slashes = False)
 def home():
     log_visit('/')
     return render_template('healthcare/login.html')
@@ -21,7 +21,7 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        logging.info(f"Login attempt | profile: healthcare | user: {username} | password: {password}")
+        logging.info(f"Login attempt | profile: healthcare | IP: {request.remote_addr} | user: {username} | password: {password}")
         for h in logging.getLogger().handlers:
             h.flush()
     return render_template('healthcare/login.html')
@@ -30,6 +30,11 @@ def login():
 def admin():
     log_visit('/admin')
     return render_template('healthcare/admin.html')
+
+@healthcare.route('/appointments')
+def appointments():
+    log_visit('/appointments')
+    return render_template('healthcare/appointments.html')
 
 @healthcare.route('/patient-records')
 def patient_records():
@@ -46,7 +51,7 @@ def env():
     log_visit('/.env')
     return send_from_directory('static/healthcare', '.env')
 
-@healthcare.route('/backup.sql')
-def backup_sql():
-    log_visit('/backup.sql')
-    return send_from_directory('static/healthcare', 'backup.sql', as_attachment = True)
+@healthcare.route('/medical_backup.sql')
+def medical_backup_sql():
+    log_visit('/medical_backup.sql')
+    return send_from_directory('static/healthcare', 'medical_backup.sql', as_attachment = True)
